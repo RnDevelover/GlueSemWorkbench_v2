@@ -254,7 +254,11 @@ public class LinearLogicParser {
              */
             pos++;
             LLTerm scope = parseTerm(unparsedInput,polarity);
-            scope.setVariable((LLAtom) var);
+
+            if (scope.getVariable2() == null)
+                scope.setVariable2(new ArrayList<>());
+
+            scope.getVariable2().add((LLAtom) var);
 
             if (scope instanceof LLFormula)
             {

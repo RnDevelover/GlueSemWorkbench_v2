@@ -394,9 +394,11 @@ public class LLProver2 {
             if (l instanceof LLFormula) {
                 db.compilations++;
                 //Compile out stuff
-                LLFormula compiledGlue = new LLFormula(((LLFormula) l).getRhs(), f.getRhs(), f.isPolarity(), f.getVariable());
+                LLFormula compiledGlue = new LLFormula(((LLFormula) l).getRhs(), f.getRhs(), f.isPolarity(), f.getVariable2());
                 compiledGlue.getLhs().orderedDischarges.addAll(l.getOrderedDischarges());
                 LLTerm outGlue = ((LLFormula) l).getLhs();
+
+                outGlue.setVariable2(f.getVariable2());
 
 
                 //outGlue.assumptions.add(outGlue);

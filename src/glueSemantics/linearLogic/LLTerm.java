@@ -43,6 +43,9 @@ public abstract class LLTerm {
 
     private LLAtom variable;
 
+    private List<LLAtom> variable2;
+
+
     //Default constructor
     public LLTerm(){ }
 
@@ -50,6 +53,11 @@ public abstract class LLTerm {
     public LLTerm(LLAtom var)
     {
         this.variable = var;
+    }
+
+    public LLTerm(List<LLAtom> var)
+    {
+        this.variable2 = var;
     }
 
     public boolean isPolarity() { return polarity; }
@@ -110,29 +118,31 @@ public abstract class LLTerm {
     /*
    Represents the binder relation between the quantifier
    and the variables in the scope of the quantifier
+   TODO make it so that multiple Variables can occur in a formula, e.g.
+   (X -o Y) -o (Y -o X)
    */
     public List<LLAtom> findBoundOccurrences(LLTerm term){
 
 
-        // Variables that are equivalent are bound by the quantifier
-        if (term instanceof LLAtom) {
-            if (((LLAtom) term).getLLtype() == LLAtom.LLType.VAR){
+        for (LLAtom variable : getVariable2()) {
+            // Variables that are equivalent are bound by the quantifier
+            if (term instanceof LLAtom) {
+                if (((LLAtom) term).getLLtype() == LLAtom.LLType.VAR) {
 
-                if (getVariable().checkEquivalence(term))
-                {
-                    List <LLAtom> var = new ArrayList<>();
-                    var.add((LLAtom) term);
-                    return var;
+                    if (variable.checkEquivalence(term)) {
+                        List<LLAtom> var = new ArrayList<>();
+                        var.add((LLAtom) term);
+                        return var;
+                    }
                 }
+
+                //Recursive call to find embedded instances of variables
+            } else if (term instanceof LLFormula) {
+                List<LLAtom> right = findBoundOccurrences(((LLFormula) term).getLhs());
+                List<LLAtom> left = findBoundOccurrences(((LLFormula) term).getRhs());
+
+                return Stream.concat(right.stream(), left.stream()).collect(Collectors.toList());
             }
-
-            //Recursive call to find embedded instances of variables
-        } else if ( term instanceof LLFormula)
-        {
-            List <LLAtom> right = findBoundOccurrences(((LLFormula) term).getLhs());
-            List <LLAtom> left = findBoundOccurrences(((LLFormula) term).getRhs());
-
-            return Stream.concat(right.stream(), left.stream()).collect(Collectors.toList());
         }
         List<LLAtom> emptyList = Collections.emptyList();
         return emptyList;
@@ -179,4 +189,13 @@ public abstract class LLTerm {
     public void setVariable(LLAtom variable) {
         this.variable = variable;
     }
+
+    public List<LLAtom> getVariable2() {
+        return variable2;
+    }
+
+    public void setVariable2(List<LLAtom> variable2) {
+        this.variable2 = variable2;
+    }
+
 }

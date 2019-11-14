@@ -1,0 +1,5 @@
+someone : AX_t.(g_e -o (X_t -o X_t))
+from : (g_e -o (h_e -o  p_t))
+everycity : AX_t.(h_e -o (X_t -o X_t))
+
+

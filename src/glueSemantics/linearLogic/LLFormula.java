@@ -48,8 +48,73 @@ public class LLFormula extends LLTerm {
         this.setType(new SemType(lhs.getType(),rhs.getType()));
         this.setPolarity(pol);
         this.operator = LLIMP;
+
+
+        if (getVariable() != null) {
+            addBoundVariables(getVariable());
+        }
+
+
+
+    //    updateBoundVariables();
+
         //setVariable(var);
 
+        /*
+        if(getVariable()!= null) {
+            //List<LLAtom> bvl = Stream.concat(findBoundOccurrences(lhs).stream(),findBoundOccurrences(rhs).stream()).collect(Collectors.toList());
+            List<LLAtom> bvl = new ArrayList<>();
+            bvl.addAll(findBoundOccurrences(lhs));
+            bvl.addAll(findBoundOccurrences(rhs));
+            this.boundVariables.put(getVariable(), bvl);
+        }
+         */
+    }
+
+    public LLFormula(LLTerm lhs, LLTerm rhs, boolean pol, List<LLAtom> var) {
+        super(var);
+        this.lhs = lhs;
+        this.rhs = rhs;
+        this.setType(new SemType(lhs.getType(), rhs.getType()));
+        this.setPolarity(pol);
+        this.operator = LLIMP;
+
+
+        if (getVariable2() != null) {
+            addBoundVariables(getVariable2());
+        }
+    }
+
+    public void addBoundVariables(LLAtom var)
+    {
+        if (!boundVariables.keySet().contains(var))
+        {
+            List<LLAtom> bvl = new ArrayList<>();
+            bvl.addAll(findBoundOccurrences(this));
+            this.boundVariables.put(var,bvl);
+        }else
+        {
+            boundVariables.get(var).addAll(findBoundOccurrences(this));
+        }
+    }
+
+    public void addBoundVariables(List<LLAtom> var)
+    {
+        for (LLAtom atom : var) {
+            if (!boundVariables.keySet().contains(atom)) {
+                List<LLAtom> bvl = new ArrayList<>();
+                bvl.addAll(findBoundOccurrences(this));
+                this.boundVariables.put(atom, bvl);
+            } else {
+                boundVariables.get(atom).addAll(findBoundOccurrences(this));
+            }
+        }
+    }
+
+
+
+    public void updateBoundVariables()
+    {
         if(getVariable()!= null) {
             //List<LLAtom> bvl = Stream.concat(findBoundOccurrences(lhs).stream(),findBoundOccurrences(rhs).stream()).collect(Collectors.toList());
             List<LLAtom> bvl = new ArrayList<>();
@@ -59,8 +124,7 @@ public class LLFormula extends LLTerm {
         }
     }
 
-
-    public void updateBoundVariables()
+    public void updateBoundVariables2(LLAtom var)
     {
         if(getVariable()!= null) {
             //List<LLAtom> bvl = Stream.concat(findBoundOccurrences(lhs).stream(),findBoundOccurrences(rhs).stream()).collect(Collectors.toList());
