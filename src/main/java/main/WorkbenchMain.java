@@ -41,6 +41,7 @@ public class WorkbenchMain {
     
     private static String explanation = "";
     private static boolean explainFail = false;
+    private static boolean assureGlueParsing = false;
 
     
 
@@ -148,6 +149,11 @@ public class WorkbenchMain {
                     	stdOut = true;
                     	break;
                     }
+                    case("-assureGlueParsing"):
+                    {
+                    	assureGlueParsing = true;
+                    	break;
+                    }
                     case ("-vis"):
                         settings.setVisualize(true);
                         break;
@@ -251,7 +257,15 @@ public class WorkbenchMain {
 
 				if (!solutions.keySet().isEmpty()) {
 					if (onlyMeaningSide) {
-						w.append("% Proof(s) found." + System.lineSeparator());
+						int nProofs = 0;
+						for (Integer key : solutions.keySet()) 
+							for (int i = 0; i < solutions.get(key).size(); i++) 
+								nProofs ++;
+
+						if (nProofs == 1) 
+							w.append("% 1 proof found." + System.lineSeparator());
+						else 
+							w.append("% " + Integer.toString(nProofs) + " proofs found." + System.lineSeparator());
 					}
 					for (Integer key : solutions.keySet()) {
 						for (int i = 0; i < solutions.get(key).size(); i++) {
@@ -372,6 +386,11 @@ public class WorkbenchMain {
                 singleSet.add(parser.parseMeaningConstructor(s));
             } catch (ParserInputException e) {
                 LOGGER.warning(String.format("Error: glue parser could not parse line %d of input file. Skipping this line.",formulas.indexOf(s)));
+                if(assureGlueParsing) {
+                    LOGGER.warning("Skipping this set of premises since some premises in this set could not be parsed properly.");
+                	singleSet.clear();
+                	break;
+                }
             }
         }
         if (singleSet.isEmpty()) {
@@ -389,7 +408,7 @@ public class WorkbenchMain {
                    searchProof(key,lexicalEntries.get(key));
                }
             }
-            }
+        }
 
     /*
     public static void searchProof(List<LexicalEntry> lexicalEntries) throws VariableBindingException {
